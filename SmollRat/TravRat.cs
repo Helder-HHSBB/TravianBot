@@ -10,7 +10,7 @@ namespace SmollRat
     class TravRat
     {
 
-        static void Main(string[] args)
+        static void MainOld(string[] args)
         {
             double wood, clay, iron, grain, warehouse, granary;
             bool firstlogstatus = false, logstatus = false;
