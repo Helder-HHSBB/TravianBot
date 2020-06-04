@@ -124,6 +124,35 @@ namespace SmollRat
 
                         Console.WriteLine("Ataque " + (i + 1) + " Enviado.");
                     }
+                    if (xTropCount < 3)
+                    {
+                        driver.FindElement(By.CssSelector("#troops > tbody > tr:nth-child(3) > td.line-last.column-first.large.‭ > a"));
+                        var auxTroopCount2 = driver.FindElement(By.CssSelector("#troops > tbody > tr:nth-child(3) > td.line-last.column-first.large.‭ > a"));
+                        var troopCount2 = auxTroopCount2.Text;
+                        var cleanTroop2 = Regex.Replace(troopCount2, "[^0-9 ]", "");
+                        var xTropCount2 = double.Parse(cleanTroop2);
+                        if (xTropCount2 >= 3)
+                        {
+                            driver.FindElement(By.CssSelector("#troops > tbody > tr:nth-child(3) > td.line-last.column-first.large.‭ > input")).SendKeys("3");
+                            string myString = x[i].ToString();
+                            string myString1 = y[i].ToString();
+                            driver.FindElement(By.CssSelector("#xCoordInput")).SendKeys(myString);
+                            SmallWait();
+                            driver.FindElement(By.CssSelector("#yCoordInput")).SendKeys(myString1);
+                            driver.FindElement(By.CssSelector("#build > div > form > div.option > label:nth-child(3) > input")).Click();
+                            SmallWait();
+                            driver.FindElement(By.CssSelector("#btn_ok")).Click();
+                            SmallWait();
+                            driver.FindElement(By.CssSelector("#btn_ok")).Click();
+                            Console.WriteLine("Ataque " + (i + 1) + " Enviado.");
+                        }
+                        else if (xTropCount2 < 3)
+                        {
+                            Console.WriteLine("No troops at HOME :( ");
+                            return;
+                        }
+                    }
+
                 }
                 catch (NoSuchElementException)
                 {
