@@ -16,11 +16,14 @@ namespace SmollRat.models.travian
             "#content > div.outerLoginBox > div.innerLoginBox > form > table > tbody > tr.pass > td:nth-child(2) > input";
         private const string PageLoginButton = "#s1";
         private const string PagePlayerName = "#sidebarBoxActiveVillage > div.content > div.playerName";
-        
+
+        public Village village { get; set; }
+
         public Account(string username, string password)
         {
             this.username = username;
             this.password = password;
+            this.village = new Village();
         }
 
         public bool login(TravianIWebDriver driver)
@@ -36,10 +39,9 @@ namespace SmollRat.models.travian
             driver.SmallWait();
 
             return isLoggedIn(driver);
-
         }
 
-        private bool isLoggedIn(TravianIWebDriver driver)
+        public bool isLoggedIn(TravianIWebDriver driver)
         {
             try
             {

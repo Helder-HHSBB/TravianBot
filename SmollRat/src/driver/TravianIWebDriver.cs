@@ -24,5 +24,24 @@ namespace SmollRat.driver
             System.Threading.Thread.Sleep(res);
             return true;
         }
+        
+        public void BigWait()
+        {
+            Random rand = new Random();
+            
+            double u1 = 1.0 - rand.NextDouble();
+            double u2 = 1.0 - rand.NextDouble();
+            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
+            double randNormal = 1500000 + 99999 * randStdNormal; //(mean,stdDev^2)
+            
+            int res = Convert.ToInt32(randNormal);
+            if (res < 720000) { res = res + 20000; }
+            
+            double waitMinutes = TimeSpan.FromMilliseconds(res).TotalMinutes;
+            Console.WriteLine("In minutes Sleeping for: " + waitMinutes);
+            Console.WriteLine("");
+            
+            System.Threading.Thread.Sleep(res);
+        }
     }
 }
