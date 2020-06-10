@@ -9,7 +9,7 @@ namespace SmollRat.models.travian
         private string username;
         private string password;
         
-        private const string LoginUrl = "https://ts3.travian.com/login.php";
+        private const string LoginUrl = "https://tx3.lusobrasileiro.travian.com/login.php";
         private const string PageLoginBox =
             "#content > div.outerLoginBox > div.innerLoginBox > form > table > tbody > tr.account > td:nth-child(2) > input";
         private const string PagePasswordBox =
@@ -38,7 +38,15 @@ namespace SmollRat.models.travian
 
             driver.SmallWait();
 
-            return isLoggedIn(driver);
+            try
+            {
+                driver.FindElement(By.CssSelector(PagePlayerName));
+                return true;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
         }
 
         public bool isLoggedIn(TravianIWebDriver driver)

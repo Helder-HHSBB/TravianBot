@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using OpenQA.Selenium;
 using SmollRat.driver;
 using SmollRat.models.travian;
 
@@ -9,8 +11,10 @@ namespace SmollRat
         static void Main(string[] args)
         {
             //we should pass these as arguments from the command line though
-            var username = "OMalhaVacas";
-            var password = "amigo12_007581.";
+            Console.WriteLine("Acc Name: ");
+            var username = Console.ReadLine();
+            Console.WriteLine("Password: ");
+            var password = Console.ReadLine();
             
             var account = new Account(username, password);
             var driver = new TravianIWebDriver();
@@ -19,44 +23,72 @@ namespace SmollRat
             {
                 Console.WriteLine("We managed to LogIn ;D");
             }
-            
-         
-            
+
+           
+           
+
             while (loggedIn)
             {
 
                 do
                 {
-                    account.village.getResources(driver);
+                     account.village.getResources(driver);
+                     Console.WriteLine("");
+                     Console.WriteLine ($"Wood: {account.village.resources[Resource.WOOD]}");
+                     Console.WriteLine($"Clay: {account.village.resources[Resource.CLAY]}");
+                     Console.WriteLine($"Iron: {account.village.resources[Resource.IRON]}");
+                     Console.WriteLine($"Grain: {account.village.resources[Resource.WHEAT]}");
+                     Console.WriteLine($"WareHouse: {account.village.resourceCapacity[Resource.WOOD]}");
+                     Console.WriteLine($"Granary: {account.village.resourceCapacity[Resource.WHEAT]}");
+                     Console.WriteLine("");
 
-                    Console.WriteLine("");
-                    Console.WriteLine ($"Wood: {account.village.resources[Resource.WOOD]}");
-                    Console.WriteLine($"Clay: {account.village.resources[Resource.CLAY]}");
-                    Console.WriteLine($"Iron: {account.village.resources[Resource.IRON]}");
-                    Console.WriteLine($"Grain: {account.village.resources[Resource.WHEAT]}");
-                    Console.WriteLine($"WareHouse: {account.village.resourceCapacity[Resource.WOOD]}");
-                    Console.WriteLine($"Granary: {account.village.resourceCapacity[Resource.WHEAT]}");
-                    Console.WriteLine("");
 
-                    if (account.village.resources[Resource.WOOD] > 1000 
-                        && account.village.resources[Resource.CLAY] > 1000 
-                        && (account.village.resources[Resource.IRON] > 1000) 
-                        && (account.village.resources[Resource.WHEAT] > 500))
-                    {
-                        account.village.LvlUpResourcesByOrder(driver);
-                        account.village.TrainBarracks(driver);
-                                                       
-                    }
-                    else Console.WriteLine("Not enough resources to build");
                     
+                    driver.SmallWait();
+                    
+                  
+                    var waitbuild1 = account.village.LvlUpResourcesByOrder(driver, 1);
+                    Console.WriteLine(waitbuild1);
+                   
+                    var waitbuild2 = account.village.LvlUpResourcesByOrder(driver, 2);
+                    Console.WriteLine(waitbuild2);
+                    
+                    driver.SmallWait();
+                    
+                    account.village.SendFarmList(driver);
+                    driver.SmallWait();
+                    
+                    //Make Imperatoris on First Villa if resources are ok
+                    driver.FindElement(By.XPath("//*[@id='sidebarBoxVillagelist']/div[2]/ul/li[1]/a/span[1]/span")).Click();
+                    driver.SmallWait();
+                    account.village.getResources(driver);
+                    if (
+                        account.village.resources[Resource.WOOD] > 2500
+                        && account.village.resources[Resource.CLAY] > 2500
+                        && account.village.resources[Resource.IRON] > 2500
+                        && account.village.resources[Resource.WHEAT] > 500
+
+                        )
+                    {
+                        account.village.TrainImperatoris(driver);
+                    }
+                    else Console.WriteLine("Not Enough Resources to queue more troops");
+
+
+
+                    //*[contains(@class, 'good level colorLayer')]
+
+                    // account.village.TrainBarracks(driver);
+
+
                     DateTime now = DateTime.Now;
                     Console.WriteLine("Time Now: " + now);
-                    driver.SmallWait();
-                    account.village.SendTroopsLegs(driver);
                     driver.BigWait();
                     
+                    //account.village.SendTroopsLegs(driver);
+                    
                     loggedIn = account.isLoggedIn(driver); 
-                    if (!loggedIn) 
+                    if (loggedIn==false) 
                     {
                         int tries = 0;
                         do
@@ -66,7 +98,7 @@ namespace SmollRat
                             System.Threading.Thread.Sleep(5000);
                             loggedIn = account.login(driver);
                             tries++;                       
-                        } while (!loggedIn || tries <3);
+                        } while (loggedIn==false || tries <3);
                         
                         if (tries >= 3) 
                         {
