@@ -47,7 +47,7 @@ namespace SmollRat.driver
             double u1 = 1.0 - rand.NextDouble();
             double u2 = 1.0 - rand.NextDouble();
             double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
-            double randNormal = 600000 + 9999 * randStdNormal; //(mean,stdDev^2)
+            double randNormal = 1000000 + 200000 * randStdNormal; //(mean,stdDev^2)
             
             int res = Convert.ToInt32(randNormal);
             if (res < 120000) { res = res + 20000; }

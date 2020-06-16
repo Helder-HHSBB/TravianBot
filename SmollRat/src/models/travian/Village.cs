@@ -162,20 +162,30 @@ namespace SmollRat.models.travian
 
         public bool TrainImperatoris(TravianIWebDriver driver)
         {
-          
-               
+           
+            try
+            {
+                driver.FindElement(By.CssSelector(PageVillage1)).Click();
+                driver.SmallWait();
+                driver.FindElement(By.XPath("//*[contains(@class, 'stable')]")).Click();
+                driver.SmallWait();
 
-            driver.FindElement(By.XPath("//*[contains(@class, 'stable')]")).Click();
-            driver.SmallWait();
+                driver.FindElement(By.XPath("//*[@id='nonFavouriteTroops']/div[5]/div/div[2]/div[4]/input")).SendKeys("3");
+                driver.SmallWait();
 
-            driver.FindElement(By.XPath("//*[contains(@name, 't5')]")).SendKeys("1");
-            driver.SmallWait();
+
+                driver.FindElement(By.XPath("//*[@id='s1']")).Click();
+                driver.SmallWait();
+
+                return true;
+            }
+            catch (NoSuchElementException)
+            {
+                Console.WriteLine("FAILED TO TRAIN TROOPS");
+                return false;
+            }
+
             
-
-            driver.FindElement(By.XPath("//*[@id='s1']")).Click();
-            driver.SmallWait();
-
-            return true;
         }
         public bool TrainBarracks (TravianIWebDriver driver)
         {
@@ -196,13 +206,45 @@ namespace SmollRat.models.travian
         }
 
 
-        public void SendFarmList(TravianIWebDriver driver)
+        public int SendFarmList(TravianIWebDriver driver, int flag)
         {
-            driver.FindElement(By.XPath("//*[@id='sidebarBoxLinklist']/div[2]/ul/li/a")).Click();
-            driver.SmallWait();
-            driver.FindElement(By.XPath("//*[@id='raidListMarkAll1121']")).Click();
-            driver.SmallWait();
-            driver.FindElement(By.XPath("//*[contains(@value, 'Começar assalto')]")).Click();
+            if (flag == 1)
+            {
+
+                driver.FindElement(By.XPath("//*[@id='sidebarBoxLinklist']/div[2]/ul/li/a")).Click();
+                driver.SmallWait();
+            } 
+            
+            try
+            {
+                driver.FindElement(By.XPath("//*[@class='markAll check']")).Click();
+                driver.SmallWait();
+                driver.FindElement(By.XPath("//*[contains(@value, 'Começar assalto')]")).Click();
+                driver.SmallWait();
+                return 1;
+            }
+            catch (NoSuchElementException)
+            {
+                try
+                {
+                    driver.FindElement(By.XPath("//*[@id='sidebarBoxLinklist']/div[2]/ul/li/a")).Click();
+                    driver.SmallWait();
+                    driver.FindElement(By.XPath("//*[@id='raidListMarkAll1121']")).Click();
+                    driver.SmallWait();
+                    driver.FindElement(By.XPath("//*[contains(@value, 'Começar assalto')]")).Click();
+                    driver.SmallWait();
+                    return 1; 
+                }
+                catch (NoSuchElementException)
+                {
+                    Console.WriteLine("We have tried, but we failed to send RaidList this time.");
+                    return -1;
+                }
+                   
+                
+               
+            }
+            
 
         }
 

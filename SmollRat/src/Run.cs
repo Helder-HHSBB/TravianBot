@@ -11,11 +11,14 @@ namespace SmollRat
         static void Main(string[] args)
         {
             //we should pass these as arguments from the command line though
-            Console.WriteLine("Acc Name: ");
+        
+
+           
+            Console.WriteLine("Hello tell me Acc Name: ");
             var username = Console.ReadLine();
             Console.WriteLine("Password: ");
             var password = Console.ReadLine();
-            
+            bool flagTrain = false;
             var account = new Account(username, password);
             var driver = new TravianIWebDriver();
             var loggedIn = account.login(driver);
@@ -24,23 +27,25 @@ namespace SmollRat
                 Console.WriteLine("We managed to LogIn ;D");
             }
 
-           
-           
+          
+
+
+
 
             while (loggedIn)
             {
 
                 do
                 {
-                     account.village.getResources(driver);
-                     Console.WriteLine("");
-                     Console.WriteLine ($"Wood: {account.village.resources[Resource.WOOD]}");
-                     Console.WriteLine($"Clay: {account.village.resources[Resource.CLAY]}");
-                     Console.WriteLine($"Iron: {account.village.resources[Resource.IRON]}");
-                     Console.WriteLine($"Grain: {account.village.resources[Resource.WHEAT]}");
-                     Console.WriteLine($"WareHouse: {account.village.resourceCapacity[Resource.WOOD]}");
-                     Console.WriteLine($"Granary: {account.village.resourceCapacity[Resource.WHEAT]}");
-                     Console.WriteLine("");
+                     //account.village.getResources(driver);
+                     //Console.WriteLine("");
+                     //Console.WriteLine ($"Wood: {account.village.resources[Resource.WOOD]}");
+                     //Console.WriteLine($"Clay: {account.village.resources[Resource.CLAY]}");
+                     //Console.WriteLine($"Iron: {account.village.resources[Resource.IRON]}");
+                     //Console.WriteLine($"Grain: {account.village.resources[Resource.WHEAT]}");
+                     //Console.WriteLine($"WareHouse: {account.village.resourceCapacity[Resource.WOOD]}");
+                     //Console.WriteLine($"Granary: {account.village.resourceCapacity[Resource.WHEAT]}");
+                     //Console.WriteLine("");
 
 
                     
@@ -55,24 +60,44 @@ namespace SmollRat
                     
                     driver.SmallWait();
                     
-                    account.village.SendFarmList(driver);
-                    driver.SmallWait();
-                    
-                    //Make Imperatoris on First Villa if resources are ok
-                    driver.FindElement(By.XPath("//*[@id='sidebarBoxVillagelist']/div[2]/ul/li[1]/a/span[1]/span")).Click();
-                    driver.SmallWait();
-                    account.village.getResources(driver);
-                    if (
-                        account.village.resources[Resource.WOOD] > 2500
-                        && account.village.resources[Resource.CLAY] > 2500
-                        && account.village.resources[Resource.IRON] > 2500
-                        && account.village.resources[Resource.WHEAT] > 500
-
-                        )
+                    var tries = 0;
+                    var checker = account.village.SendFarmList(driver, 1);
+                    while (checker == -1 && tries < 3 )
                     {
-                        account.village.TrainImperatoris(driver);
+                        driver.Url = "https://tx3.lusobrasileiro.travian.com/build.php?tt=99&id=39#";
+                        driver.SmallWait();
+                        checker = account.village.SendFarmList(driver,2);
+                        driver.SmallWait();
+                        driver.SmallWait();
+                        tries++;
                     }
-                    else Console.WriteLine("Not Enough Resources to queue more troops");
+                    driver.SmallWait();
+
+                    //Make Imperatoris on First Villa if resources are ok
+
+
+                    //account.village.getResources(driver);
+                    //if (
+                    //    account.village.resources[Resource.WOOD] > 2500
+                    //    && account.village.resources[Resource.CLAY] > 2500
+                    //    && account.village.resources[Resource.IRON] > 2500
+                    //    && account.village.resources[Resource.WHEAT] > 500
+
+                    //    )
+                    //{
+                    tries = 0;
+                    flagTrain = account.village.TrainImperatoris(driver);
+                    while (flagTrain == false && tries < 3)
+                    {
+                        Console.WriteLine("Trying for the " +tries + " time to train troops");
+                        driver.Url = "https://tx3.lusobrasileiro.travian.com/dorf2.php?newdid=17425&";
+                        driver.SmallWait();
+                        flagTrain = account.village.TrainImperatoris(driver);
+                        driver.SmallWait();
+                        tries++; 
+                    }
+                    //}
+                    //else Console.WriteLine("Not Enough Resources to queue more troops");
 
 
 
@@ -90,7 +115,7 @@ namespace SmollRat
                     loggedIn = account.isLoggedIn(driver); 
                     if (loggedIn==false) 
                     {
-                        int tries = 0;
+                        tries = 0;
                         do
                         {
                             Console.WriteLine("We were kicked from the server.");
