@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading;
 using OpenQA.Selenium;
 using SmollRat.driver;
@@ -20,7 +21,9 @@ namespace SmollRat
             var password = Console.ReadLine();
             bool flagTrain = false;
             var account = new Account(username, password);
+            
             var driver = new TravianIWebDriver();
+            
             var loggedIn = account.login(driver);
             if (loggedIn)
             {
@@ -50,68 +53,46 @@ namespace SmollRat
 
                     
                     driver.SmallWait();
-                    
-                  
-                    var waitbuild1 = account.village.LvlUpResourcesByOrder(driver, 1);
-                    Console.WriteLine(waitbuild1);
-                   
-                    var waitbuild2 = account.village.LvlUpResourcesByOrder(driver, 2);
-                    Console.WriteLine(waitbuild2);
+
+                    driver.Url = "https://group.europe.travian.com/build.php?tt=99&id=39#";
                     
                     driver.SmallWait();
-                    
-                    var tries = 0;
-                    var checker = account.village.SendFarmList(driver, 1);
-                    while (checker == -1 && tries < 3 )
-                    {
-                        driver.Url = "https://tx3.lusobrasileiro.travian.com/build.php?tt=99&id=39#";
-                        driver.SmallWait();
-                        checker = account.village.SendFarmList(driver,2);
-                        driver.SmallWait();
-                        driver.SmallWait();
-                        tries++;
-                    }
+
                     driver.SmallWait();
+                    ReadOnlyCollection<IWebElement> farmLists = driver.FindElements(By.XPath(("//*[contains(@class, 'listContent')]")));
 
-                    //Make Imperatoris on First Villa if resources are ok
-
-
-                    //account.village.getResources(driver);
-                    //if (
-                    //    account.village.resources[Resource.WOOD] > 2500
-                    //    && account.village.resources[Resource.CLAY] > 2500
-                    //    && account.village.resources[Resource.IRON] > 2500
-                    //    && account.village.resources[Resource.WHEAT] > 500
-
-                    //    )
-                    //{
-                    tries = 0;
-                    flagTrain = account.village.TrainImperatoris(driver);
-                    while (flagTrain == false && tries < 3)
+                    for (int i = 0; i < farmLists.Count; i++)
                     {
-                        Console.WriteLine("Trying for the " +tries + " time to train troops");
-                        driver.Url = "https://tx3.lusobrasileiro.travian.com/dorf2.php?newdid=17425&";
+                        driver.Url = "https://group.europe.travian.com/build.php?tt=99&id=39#";
                         driver.SmallWait();
-                        flagTrain = account.village.TrainImperatoris(driver);
                         driver.SmallWait();
-                        tries++; 
+                        farmLists = driver.FindElements(By.XPath(".//*[contains(@class, 'listContent')]"));
+                        ReadOnlyCollection<IWebElement> farmRows = farmLists[i].FindElements(By.XPath(".//*[contains(@class, 'slotRow')]"));
+
+                        foreach(var farmRow in farmRows)
+                        {
+                            if (farmRow.FindElements(By.XPath(".//*[contains(@alt, 'Won as attacker without losses.')]")).Count != 0)
+                            {
+                                farmRow.FindElement(By.XPath(".//*[contains(@class, 'checkbox')]/input")).Click();
+                            }
+                        }
+
+                        driver.SmallWait();
+                        driver.FindElements(By.XPath("//*[contains(@value, 'Start raid')]"))[i].Click();
+                        driver.SmallWait();
+                        driver.SmallWait();
                     }
-                    //}
-                    //else Console.WriteLine("Not Enough Resources to queue more troops");
 
 
 
-                    //*[contains(@class, 'good level colorLayer')]
-
-                    // account.village.TrainBarracks(driver);
 
 
                     DateTime now = DateTime.Now;
                     Console.WriteLine("Time Now: " + now);
-                    driver.BigWait();
+                    driver.wait(15,2);
                     
                     //account.village.SendTroopsLegs(driver);
-                    
+                    var tries = 0;
                     loggedIn = account.isLoggedIn(driver); 
                     if (loggedIn==false) 
                     {
